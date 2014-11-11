@@ -134,12 +134,21 @@ def read_bif(file):
                 'date': date
             }
         else:
-            yield {
-                'type': 'message',
-                'text': text,
-                'nick': source.partition('!')[0].rstrip(':'),
-                'date': date
-            }
+            if source == '*':
+                source, dummy, text = text.partition(' ')
+                yield {
+                    'type': 'action',
+                    'text': text,
+                    'nick': source.partition('!')[0].rstrip(':'),
+                    'date': date
+                }
+            else:
+                yield {
+                    'type': 'message',
+                    'text': text,
+                    'nick': source.partition('!')[0].rstrip(':'),
+                    'date': date
+                }
 
 
 def write_record(file_cache, dest_dir, record, censor_hostnames=False):
@@ -163,6 +172,8 @@ def write_record(file_cache, dest_dir, record, censor_hostnames=False):
 
     if record['type'] == 'event':
         source = '***'
+    elif record['type'] == 'action':
+        source = '* {}'.format(record['nick'])
     else:
         source = '<{}>'.format(record['nick'])
 
