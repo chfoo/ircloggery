@@ -3,24 +3,29 @@ import argparse
 import ircloggery.bif
 import ircloggery.writer
 import ircloggery.xchat
+import ircloggery.json
 
 
 def main():
     arg_parser = argparse.ArgumentParser()
-    arg_parser.add_argument('source_file', nargs='+',
-                            type=argparse.FileType('r', encoding='utf-8',
-                                                   errors='replace'))
+    arg_parser.add_argument('source_file', nargs='+')
     arg_parser.add_argument('dest_dir')
     arg_parser.add_argument('--censor-hostnames', action='store_true')
+    arg_parser.add_argument('--remove-duplicates', action='store_true')
 
     args = arg_parser.parse_args()
 
     # TODO: don't store in memory
     records = {}
 
-    for file in args.source_file:
-        if ircloggery.writer.sniff_type(file) == 'xchat2':
+    for filename in args.source_file:
+        file = open(filename, 'r', encoding='utf-8', errors='replace')
+
+        file_type = ircloggery.writer.sniff_type(file)
+        if file_type == 'xchat2':
             read_func = ircloggery.xchat.read_xchat2
+        elif file_type == 'json':
+            read_func = ircloggery.json.read_json_multiline
         else:
             read_func = ircloggery.bif.read_bif
 
@@ -33,7 +38,7 @@ def main():
     for record_date, text in sorted(records):
         record = records[(record_date, text)]
 
-        if prev_record and \
+        if args.remove_duplicates and prev_record and \
                         abs((prev_record['date'] - record['date']).total_seconds()) < 5 and \
                         prev_record['text'] == text:
             # duplicate
@@ -41,6 +46,9 @@ def main():
         else:
             ircloggery.writer.write_record(file_cache, args.dest_dir, record,
                          censor_hostnames=args.censor_hostnames)
+
+        if len(file_cache) > 100:
+            file_cache.popitem()[1].close()
 
         prev_record = record
 

@@ -1,4 +1,5 @@
 import calendar
+import os
 import re
 
 from ircloggery.strings import DAY_OF_WEEK_MAP
@@ -16,7 +17,7 @@ def write_record(file_cache, dest_dir, record, censor_hostnames=False):
     path = os.path.join(dest_dir, filename)
 
     if path not in file_cache:
-        file = file_cache[path] = open(path, 'w')
+        file = file_cache[path] = open(path, 'a')
     else:
         file = file_cache[path]
 
@@ -47,5 +48,7 @@ def sniff_type(file):
 
     if line.startswith('****'):
         return 'xchat2'
+    elif line.startswith('{'):
+        return 'json'
     else:
         return 'bif'
