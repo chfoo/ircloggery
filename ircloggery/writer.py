@@ -1,4 +1,5 @@
 import calendar
+import datetime
 import os
 import re
 
@@ -6,6 +7,8 @@ from ircloggery.strings import DAY_OF_WEEK_MAP
 
 
 def write_record(file_cache, dest_dir, record, censor_hostnames=False):
+    record['date'] = record['date'].astimezone(datetime.timezone.utc)
+
     year = record['date'].year
     month = record['date'].month
     day = record['date'].day
@@ -50,5 +53,7 @@ def sniff_type(file):
         return 'xchat2'
     elif line.startswith('{'):
         return 'json'
+    elif line.startswith('['):
+        return 'mirc'
     else:
         return 'bif'

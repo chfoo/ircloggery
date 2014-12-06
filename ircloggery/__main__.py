@@ -1,9 +1,11 @@
 import argparse
+import functools
 
 import ircloggery.bif
 import ircloggery.writer
 import ircloggery.xchat
 import ircloggery.json
+import ircloggery.mirc
 
 
 def main():
@@ -12,6 +14,7 @@ def main():
     arg_parser.add_argument('dest_dir')
     arg_parser.add_argument('--censor-hostnames', action='store_true')
     arg_parser.add_argument('--remove-duplicates', action='store_true')
+    arg_parser.add_argument('--timezone', default='UTC')
 
     args = arg_parser.parse_args()
 
@@ -23,9 +26,16 @@ def main():
 
         file_type = ircloggery.writer.sniff_type(file)
         if file_type == 'xchat2':
-            read_func = ircloggery.xchat.read_xchat2
+            read_func = functools.partial(
+                ircloggery.xchat.read_xchat2, time_zone=args.timezone
+            )
         elif file_type == 'json':
             read_func = ircloggery.json.read_json_multiline
+        elif file_type == 'mirc':
+            read_func = functools.partial(
+                ircloggery.mirc.read_mirc, filename=filename,
+                time_zone=args.timezone
+            )
         else:
             read_func = ircloggery.bif.read_bif
 

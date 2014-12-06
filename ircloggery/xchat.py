@@ -1,10 +1,12 @@
 import datetime
 import re
 
+import arrow
+
 from ircloggery.strings import MONTH_STR_MAP
 
 
-def read_xchat2(file):
+def read_xchat2(file, time_zone='UTC'):
     prev_month = None
 
     for line in file:
@@ -26,8 +28,10 @@ def read_xchat2(file):
             yield {
                 'type': 'event',
                 'text': line[5:],
-                'date': datetime.datetime(year, month, day, hour, minute, sec,
-                                          tzinfo=datetime.timezone.utc)
+                'date': arrow.get(datetime.datetime(year, month, day,
+                                                    hour, minute, sec),
+                                  time_zone
+                                  )
             }
             continue
 
