@@ -27,7 +27,7 @@ def read_json_multiline(file):
 
             doc = json.loads(''.join(lines))
 
-            doc['date'] = datetime.datetime.strptime(doc['date'], '%Y-%m-%dT%H:%M:%S+00:00')
+            doc['date'] = datetime.datetime.strptime(doc['date'], '%Y-%m-%dT%H:%M:%S+00:00').replace(tzinfo=datetime.timezone.utc)
 
             yield doc
         else:
