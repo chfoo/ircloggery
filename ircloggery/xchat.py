@@ -37,26 +37,39 @@ def read_xchat2(file, time_zone='UTC'):
 
         match = re.match(r'(\w{3}) (\d{2}) (\d{2}):(\d{2}):(\d{2}) (\S+)\t(.*)', line)
 
-        if not match:
-            print(repr(line))
-            continue
+        if match:
+            month = MONTH_STR_MAP[match.group(1)]
+            day = int(match.group(2))
+            hour = int(match.group(3))
+            minute = int(match.group(4))
+            sec = int(match.group(5))
+            row_time_zone = time_zone
+            source = match.group(6)
+            text = match.group(7)
 
-        month = MONTH_STR_MAP[match.group(1)]
-        day = int(match.group(2))
-        hour = int(match.group(3))
-        minute = int(match.group(4))
-        sec = int(match.group(5))
+        elif not match:
+            match = re.match(r'(\w{3}) (\d{2}) (\d{2}):(\d{2}):(\d{2})([+-]\d{4}) (\S+)\t(.*)', line)
+
+            if not match:
+                print(repr(line))
+                continue
+
+            month = MONTH_STR_MAP[match.group(1)]
+            day = int(match.group(2))
+            hour = int(match.group(3))
+            minute = int(match.group(4))
+            sec = int(match.group(5))
+            row_time_zone = match.group(6)
+            source = match.group(7)
+            text = match.group(8)
 
         if prev_month and prev_month == 12 and month == 1:
             year += 1
 
         prev_month = month
 
-        date = datetime.datetime(year, month, day, hour, minute, sec,
-                                 tzinfo=datetime.timezone.utc)
-
-        source = match.group(6)
-        text = match.group(7)
+        date = arrow.get(datetime.datetime(year, month, day, hour, minute, sec),
+                         row_time_zone)
 
         if source == '*':
             # FIXME: this might be a /me
