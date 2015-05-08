@@ -79,9 +79,12 @@ def read_xchat2(file, time_zone='UTC'):
                 'date': date
             }
         else:
+            if source[0] in '<-' and source[-1] in '>-':
+                source = source[1:-1]
+
             yield {
                 'type': 'message',
                 'text': text,
-                'nick': source.lstrip('<-').rstrip('>-'),
+                'nick': source,
                 'date': date
             }

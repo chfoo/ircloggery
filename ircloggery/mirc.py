@@ -44,9 +44,12 @@ def read_mirc(file, filename, time_zone='UTC'):
                 'nick': source,
             }
         else:
+            if source[0] in '<-' and source[-1] in '>-':
+                source = source[1:-1]
+
             yield {
                 'type': 'message',
                 'text': text,
-                'nick': source.lstrip('<-').rstrip('>-'),
+                'nick': source,
                 'date': date
             }
