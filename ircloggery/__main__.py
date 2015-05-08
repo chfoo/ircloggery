@@ -6,6 +6,7 @@ import ircloggery.writer
 import ircloggery.xchat
 import ircloggery.json
 import ircloggery.mirc
+import ircloggery.textual
 
 
 def main():
@@ -36,6 +37,8 @@ def main():
                 ircloggery.mirc.read_mirc, filename=filename,
                 time_zone=args.timezone
             )
+        elif file_type == 'textual':
+            read_func = ircloggery.textual.read_textual
         else:
             read_func = ircloggery.bif.read_bif
 

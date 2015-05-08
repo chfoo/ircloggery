@@ -48,11 +48,15 @@ def write_record(file_cache, dest_dir, record, censor_hostnames=False):
 def sniff_type(file):
     line = file.readline()
     file.seek(0)
+    segment = file.read(4096)
+    file.seek(0)
 
     if line.startswith('****'):
         return 'xchat2'
     elif line.startswith('{'):
         return 'json'
+    elif line.startswith('[') and (re.match(r'\[[\d-]+T[\d:]+[+-]\d+\] [^*]', line) or '— Begin Session —' in segment):
+        return 'textual'
     elif line.startswith('['):
         return 'mirc'
     else:
