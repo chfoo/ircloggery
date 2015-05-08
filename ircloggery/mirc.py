@@ -1,5 +1,6 @@
 import datetime
 import re
+import sys
 
 import arrow
 
@@ -15,6 +16,7 @@ def read_mirc(file, filename, time_zone='UTC'):
         line = line.lstrip().rstrip('\r\n')
 
         if not line:
+            print('mirc: unknown line ', repr(line), file=sys.stderr)
             continue
 
         match = re.match(r'\[(\d{2}):(\d{2}):(\d{2})\] (\S+) (.+)', line)

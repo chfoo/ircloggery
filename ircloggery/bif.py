@@ -1,5 +1,6 @@
 import datetime
 import re
+import sys
 
 
 def read_bif(file):
@@ -12,7 +13,7 @@ def read_bif(file):
         match = re.match(r'(\d{2})-(\d{2})-(\d{4}) (\d{2}):(\d{2}):(\d{2}) ([<>!-]+) (\S+) (.*)', line)
 
         if not match:
-            print(repr(line))
+            print('bif: unknown line ', repr(line), file=sys.stderr)
             continue
 
         day = int(match.group(1))
