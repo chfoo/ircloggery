@@ -7,6 +7,9 @@ import arrow
 
 def read_mirc(file, filename, time_zone='UTC'):
     match = re.search(r'_(\d{4})(\d{2})(\d{2})\.log', filename)
+    
+    if not match:
+        match = re.search(r'(\d{4})-(\d{2})-(\d{2})\.log', filename)
 
     year = int(match.group(1))
     month = int(match.group(2))
