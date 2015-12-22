@@ -46,8 +46,15 @@ def read_textual(file):
                 'nick': nick,
                 'date': date
             }
+        elif rest.startswith('•'):
+            nick, text = rest[2:].split(': ')
+            yield {
+                'type': 'action',
+                'text': text,
+                'nick': nick,
+                'date': date
+            }
         else:
-            # FIXME: could be a /me
             yield {
                 'type': 'event',
                 'text': rest,
